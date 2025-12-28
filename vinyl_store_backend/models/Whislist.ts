@@ -16,7 +16,6 @@ const wishlistSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// satu vinyl cuma boleh sekali per user
 wishlistSchema.index({ user: 1, vinyl: 1 }, { unique: true });
 
 export default mongoose.model("Wishlist", wishlistSchema);

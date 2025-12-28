@@ -2,10 +2,8 @@ import { Hono } from "hono";
 import {
   keepVinyl,
   getMyReservations,
-  getAllReservations,
-  updateReservationStatus
 } from "../controllers/reservationController";
-import { requireAuth, requireAdmin } from "../middleware/auth";
+import {requireAuth} from "../middleware/auth";
 
 const router = new Hono();
 
@@ -14,11 +12,5 @@ const router = new Hono();
 // =======================
 router.post("/keep/:id", requireAuth, keepVinyl);
 router.get("/my", requireAuth, getMyReservations);
-
-// =======================
-// ADMIN routes
-// =======================
-router.get("/all", requireAdmin, getAllReservations);
-router.put("/:id/status", requireAdmin, updateReservationStatus);
 
 export default router;

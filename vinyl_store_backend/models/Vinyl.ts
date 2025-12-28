@@ -2,15 +2,15 @@ import { Schema, model } from "mongoose";
 
 const VinylSchema = new Schema(
   {
-    title: { type: String, required: true },        // judul
+    title: { type: String, required: true },       
     artist: { type: String, required: true },
-    year: Number,                                   // tahun
+    year: Number,                                  
     genre: String,
-    price: Number,                                  // harga
+    price: Number,                                  
     stock: Number,
-    description: String,                            // deskripsi
-    coverUrl: String,                               // path file image
-    audioUrl: String,                               // path file audio
+    description: String,                            
+    coverUrl: String,                               
+    audioUrl: String,                               
   },
   { timestamps: true }
 );
