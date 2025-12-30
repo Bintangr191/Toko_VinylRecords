@@ -43,7 +43,6 @@ class _WishlistPageState extends State<WishlistPage> {
       print('Error loading wishlist: $e');
       print('Stack trace: $stackTrace');
       
-      // Set empty lists on error but don't throw
       if (mounted) {
         setState(() {
           _allItems = [];
@@ -51,7 +50,6 @@ class _WishlistPageState extends State<WishlistPage> {
         });
       }
       
-      // Return empty list instead of rethrowing
       return [];
     }
   }
@@ -175,346 +173,428 @@ class _WishlistPageState extends State<WishlistPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1a1a1a),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2d2d2d),
-        elevation: 0,
-        title: const Text(
-          "Wishlist Saya",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF1a1a1a),
+              const Color(0xFF2d2d2d),
+            ],
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: FutureBuilder<List<Vinyl>>(
-        future: futureWishlist,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.amber[600]!),
-                strokeWidth: 3,
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Gagal memuat wishlist",
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      snapshot.error.toString(),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        futureWishlist = loadWishlist();
-                      });
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("Coba Lagi"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber[700],
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+        child: SafeArea(
+          child: FutureBuilder<List<Vinyl>>(
+            future: futureWishlist,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.amber[600]!),
+                        strokeWidth: 3,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Loading wishlist...",
+                        style: TextStyle(color: Colors.grey[400], fontSize: 14),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }
+                );
+              }
 
-          if (_allItems.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.favorite_border, size: 80, color: Colors.grey[700]),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Wishlist masih kosong",
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Tambahkan vinyl favorit ke wishlist",
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: refresh,
-            color: Colors.amber[600],
-            backgroundColor: const Color(0xFF2d2d2d),
-            child: Column(
-              children: [
-                _buildSearchBar(),
-                const SizedBox(height: 8),
-                if (_filteredItems.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.search_off, size: 64, color: Colors.grey[700]),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Tidak ditemukan",
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 16,
-                            ),
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Gagal memuat wishlist",
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          snapshot.error.toString(),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            futureWishlist = loadWishlist();
+                          });
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text("Coba Lagi"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber[700],
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
                           ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return Column(
+                children: [
+                  // Custom Header (sama seperti HomeCatalogPage)
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.pink[700]!.withOpacity(0.2),
+                          Colors.transparent,
                         ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                       ),
                     ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filteredItems.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final vinyl = _filteredItems[index];
-                        final coverUrl = ApiConfig.resolveUrl(vinyl.coverUrl);
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xFF2d2d2d),
-                                Colors.grey[900]!,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.grey[800]!,
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => VinylDetailPage(vinylId: vinyl.id),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.pink[700],
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.pink.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
                                   ),
-                                ).then((_) => refresh());
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Row(
-                                  children: [
-                                    // Cover Image
-                                    Hero(
-                                      tag: 'vinyl_${vinyl.id}',
-                                      child: Container(
-                                        width: 90,
-                                        height: 90,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.3),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.network(
-                                            coverUrl,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, _, _) => Container(
-                                              color: Colors.grey[800],
-                                              child: Icon(
-                                                Icons.album,
-                                                size: 40,
-                                                color: Colors.amber[600],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                ],
+                              ),
+                              child: const Icon(Icons.favorite, color: Colors.white, size: 24),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ShaderMask(
+                                    shaderCallback: (bounds) => LinearGradient(
+                                      colors: [Colors.pink[600]!, Colors.pink[200]!],
+                                    ).createShader(bounds),
+                                    child: const Text(
+                                      "MY WISHLIST",
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        letterSpacing: 2,
                                       ),
                                     ),
+                                  ),
+                                  Text(
+                                    "${_filteredItems.length} Vinyl Favorit",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[400],
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        // Search Bar
+                        const SizedBox(height: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900]!.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: Colors.grey[800]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              hintText: "Cari judul atau artis...",
+                              hintStyle: TextStyle(color: Colors.grey[600]),
+                              prefixIcon: Icon(Icons.search, color: Colors.pink[600]),
+                              suffixIcon: _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.clear, color: Colors.grey[400]),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                      },
+                                    )
+                                  : null,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-                                    const SizedBox(width: 16),
+                  // Content
+                  Expanded(
+                    child: _allItems.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.favorite_border, size: 80, color: Colors.grey[700]),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "Wishlist masih kosong",
+                                  style: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Tambahkan vinyl favorit ke wishlist",
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _filteredItems.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.search_off, size: 80, color: Colors.grey[700]),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "Tidak ada vinyl ditemukan",
+                                      style: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Coba kata kunci lain",
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: refresh,
+                                color: Colors.pink[600],
+                                backgroundColor: const Color(0xFF2d2d2d),
+                                child: ListView.separated(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: _filteredItems.length,
+                                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                                  itemBuilder: (context, index) {
+                                    final vinyl = _filteredItems[index];
+                                    final coverUrl = ApiConfig.resolveUrl(vinyl.coverUrl);
 
-                                    // Info
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            vinyl.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.white,
-                                            ),
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.grey[900]!,
+                                            const Color(0xFF2d2d2d),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.grey[800]!,
+                                          width: 1,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.3),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
                                           ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.person,
-                                                size: 14,
-                                                color: Colors.grey[500],
+                                        ],
+                                      ),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(16),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => VinylDetailPage(vinylId: vinyl.id),
                                               ),
-                                              const SizedBox(width: 4),
-                                              Expanded(
-                                                child: Text(
-                                                  vinyl.artist,
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    color: Colors.grey[400],
-                                                    fontSize: 14,
+                                            ).then((_) => refresh());
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Row(
+                                              children: [
+                                                // Cover Image
+                                                Hero(
+                                                  tag: 'vinyl_${vinyl.id}',
+                                                  child: Container(
+                                                    width: 90,
+                                                    height: 90,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withOpacity(0.3),
+                                                          blurRadius: 8,
+                                                          offset: const Offset(0, 4),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                      child: Image.network(
+                                                        coverUrl,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, _, _) => Container(
+                                                          color: Colors.grey[800],
+                                                          child: Icon(
+                                                            Icons.album,
+                                                            size: 40,
+                                                            color: Colors.pink[600],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.amber[700]!,
-                                                  Colors.amber[600]!,
-                                                ],
-                                              ),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                // const Icon(
-                                                //   // Icons.attach_money,
-                                                //   // size: 14,
-                                                //   // color: Colors.white,
-                                                // ),
-                                                Text(
-                                                  "Rp ${vinyl.price.toStringAsFixed(0)}",
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
+
+                                                const SizedBox(width: 16),
+
+                                                // Info
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        vinyl.title,
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: const TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 16,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.person,
+                                                            size: 14,
+                                                            color: Colors.grey[500],
+                                                          ),
+                                                          const SizedBox(width: 4),
+                                                          Expanded(
+                                                            child: Text(
+                                                              vinyl.artist,
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                              style: TextStyle(
+                                                                color: Colors.grey[400],
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          gradient: LinearGradient(
+                                                            colors: [
+                                                              Colors.pink[700]!,
+                                                              Colors.pink[600]!,
+                                                            ],
+                                                          ),
+                                                          borderRadius: BorderRadius.circular(6),
+                                                        ),
+                                                        child: Text(
+                                                          "Rp ${vinyl.price.toStringAsFixed(0)}",
+                                                          style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                const SizedBox(width: 8),
+
+                                                // Delete Button
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red[900]!.withOpacity(0.3),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(
+                                                      color: Colors.red[700]!,
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      Icons.delete_outline,
+                                                      color: Colors.red[400],
+                                                    ),
+                                                    onPressed: () => removeWishlist(vinyl.id),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    const SizedBox(width: 8),
-
-                                    // Delete Button
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.red[900]!.withOpacity(0.3),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: Colors.red[700]!,
-                                          width: 1,
                                         ),
                                       ),
-                                      child: IconButton(
-                                        icon: Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red[400],
-                                        ),
-                                        onPressed: () => removeWishlist(vinyl.id),
-                                      ),
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                   ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: TextField(
-        controller: _searchController,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: "Cari judul atau artis...",
-          hintStyle: TextStyle(color: Colors.grey[600]),
-          prefixIcon: Icon(Icons.search, color: Colors.amber[600]),
-          filled: true,
-          fillColor: const Color(0xFF2d2d2d),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.grey[800]!),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.grey[800]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: Colors.amber[600]!, width: 2),
+                ],
+              );
+            },
           ),
         ),
       ),

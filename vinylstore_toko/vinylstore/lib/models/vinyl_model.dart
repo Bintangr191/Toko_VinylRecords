@@ -1,5 +1,4 @@
 class Vinyl {
-  /// MongoDB _id → HARUS non-null
   final String id;
 
   final String title;

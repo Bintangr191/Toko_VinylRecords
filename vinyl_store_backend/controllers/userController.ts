@@ -43,7 +43,7 @@ export const updateProfile = async (c: Context) => {
   }
 
   const updated = await User.findByIdAndUpdate(
-    currentUser.id,          // ✅ FIX DI SINI
+    currentUser.id,         
     { username },
     { new: true }
   ).select("username role");
@@ -81,7 +81,7 @@ export const updatePassword = async (c: Context) => {
     );
   }
 
-  const dbUser = await User.findById(currentUser.id); // ✅ FIX
+  const dbUser = await User.findById(currentUser.id); 
 
   if (!dbUser) {
     return c.json({ message: "User tidak ditemukan" }, 404);
